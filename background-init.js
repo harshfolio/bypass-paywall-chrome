@@ -175,66 +175,63 @@ ext_api.storage.sync.get('userSettings').then(data => {
     ext_api.storage.sync.set({ userSettings: defaultSettings });
     console.log('[BPC v4.0] Default settings initialized (Medium redirect: OFF)');
   }
+
+  // Setup Medium redirect for MV3 using declarativeNetRequest
+  if (ext_manifest_version === 3) {
+    setupMediumRedirect(data.userSettings || {});
+  }
 });
 
-/**
- * Medium redirect handler (Manifest V3)
- * Redirects Medium articles to Freedium or Scribe based on user settings
- */
+// Listen for settings changes and update redirect rules
 if (ext_manifest_version === 3) {
-  // Medium domains (including custom domains like towardsdatascience.com, betterprogramming.pub)
-  const medium_domains = [
-    '*://*.medium.com/*',
-    '*://medium.com/*',
-    '*://*.towardsdatascience.com/*',
-    '*://towardsdatascience.com/*',
-    '*://*.betterprogramming.pub/*',
-    '*://betterprogramming.pub/*'
-  ];
-
-  // Cache settings for fast access (updated on storage change)
-  let cachedSettings = null;
-
-  // Load initial settings
-  ext_api.storage.sync.get('userSettings').then(data => {
-    cachedSettings = data.userSettings;
-  });
-
-  // Listen for settings changes
   ext_api.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync' && changes.userSettings) {
-      cachedSettings = changes.userSettings.newValue;
-      console.log('[BPC] Settings updated, Medium redirect:', cachedSettings?.features?.mediumRedirect);
+      setupMediumRedirect(changes.userSettings.newValue || {});
     }
   });
+}
 
-  ext_api.webRequest.onBeforeRequest.addListener(
-    function (details) {
-      // Use cached settings for instant checking
-      if (!cachedSettings || cachedSettings.features?.mediumRedirect !== true) {
-        return; // Don't redirect (disabled or not loaded)
-      }
+/**
+ * Setup Medium redirect using declarativeNetRequest (MV3)
+ */
+async function setupMediumRedirect(settings) {
+  const MEDIUM_RULE_ID = 90000; // High ID to avoid conflicts
 
-      // Get redirect target (freedium or scribe)
-      let target = cachedSettings.features?.mediumRedirectTarget || 'freedium';
+  try {
+    // Always remove existing rule first
+    await ext_api.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [MEDIUM_RULE_ID]
+    });
 
-      // Build redirect URL
-      let redirectUrl;
-      if (target === 'scribe') {
-        redirectUrl = 'https://scribe.rip/' + details.url;
-      } else {
-        // Default to freedium
-        redirectUrl = 'https://freedium.cfd/' + details.url;
-      }
+    // If redirect is enabled, add the rule
+    if (settings.features?.mediumRedirect === true) {
+      const target = settings.features?.mediumRedirectTarget || 'freedium';
+      const redirectUrl = target === 'scribe' ? 'https://scribe.rip/' : 'https://freedium.cfd/';
 
-      console.log(`[BPC] Redirecting Medium article to ${target}:`, redirectUrl);
-      return { redirectUrl: redirectUrl };
-    },
-    { urls: medium_domains, types: ["main_frame"] },
-    ["blocking"]
-  );
+      await ext_api.declarativeNetRequest.updateDynamicRules({
+        addRules: [{
+          id: MEDIUM_RULE_ID,
+          priority: 100,
+          action: {
+            type: 'redirect',
+            redirect: {
+              regexSubstitution: redirectUrl + '\\0'
+            }
+          },
+          condition: {
+            regexFilter: '(https?://([^/]*\\.)?medium\\.com/.*|https?://([^/]*\\.)?towardsdatascience\\.com/.*|https?://([^/]*\\.)?betterprogramming\\.pub/.*)',
+            resourceTypes: ['main_frame']
+          }
+        }]
+      });
 
-  console.log('[BPC v4.0] Medium redirect handler registered (default: OFF)');
+      console.log(`[BPC v4.0] Medium redirect enabled (target: ${target})`);
+    } else {
+      console.log('[BPC v4.0] Medium redirect disabled');
+    }
+  } catch (error) {
+    console.error('[BPC] Failed to setup Medium redirect:', error);
+  }
 }
 
 console.log('[BPC v4.0] Background initialization script loaded');
