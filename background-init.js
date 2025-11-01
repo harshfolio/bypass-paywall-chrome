@@ -152,4 +152,89 @@ async function trackSiteVisit(domain) {
 // Initialize on extension load (synchronous)
 initializeBPC();
 
+// Initialize default settings if they don't exist
+ext_api.storage.sync.get('userSettings').then(data => {
+  if (!data.userSettings) {
+    // First time - set defaults with Medium redirect OFF
+    const defaultSettings = {
+      features: {
+        mediumRedirect: false, // OFF by default - user must enable
+        mediumRedirectTarget: 'freedium',
+        ampRedirect: false,
+        archiveRedirect: false,
+        autoBypass: true
+      },
+      siteOverrides: {},
+      preferredRegion: 'global',
+      performance: {
+        usageLearning: true,
+        preloadCore: true
+      }
+    };
+
+    ext_api.storage.sync.set({ userSettings: defaultSettings });
+    console.log('[BPC v4.0] Default settings initialized (Medium redirect: OFF)');
+  }
+});
+
+/**
+ * Medium redirect handler (Manifest V3)
+ * Redirects Medium articles to Freedium or Scribe based on user settings
+ */
+if (ext_manifest_version === 3) {
+  // Medium domains (including custom domains like towardsdatascience.com, betterprogramming.pub)
+  const medium_domains = [
+    '*://*.medium.com/*',
+    '*://medium.com/*',
+    '*://*.towardsdatascience.com/*',
+    '*://towardsdatascience.com/*',
+    '*://*.betterprogramming.pub/*',
+    '*://betterprogramming.pub/*'
+  ];
+
+  // Cache settings for fast access (updated on storage change)
+  let cachedSettings = null;
+
+  // Load initial settings
+  ext_api.storage.sync.get('userSettings').then(data => {
+    cachedSettings = data.userSettings;
+  });
+
+  // Listen for settings changes
+  ext_api.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && changes.userSettings) {
+      cachedSettings = changes.userSettings.newValue;
+      console.log('[BPC] Settings updated, Medium redirect:', cachedSettings?.features?.mediumRedirect);
+    }
+  });
+
+  ext_api.webRequest.onBeforeRequest.addListener(
+    function (details) {
+      // Use cached settings for instant checking
+      if (!cachedSettings || cachedSettings.features?.mediumRedirect !== true) {
+        return; // Don't redirect (disabled or not loaded)
+      }
+
+      // Get redirect target (freedium or scribe)
+      let target = cachedSettings.features?.mediumRedirectTarget || 'freedium';
+
+      // Build redirect URL
+      let redirectUrl;
+      if (target === 'scribe') {
+        redirectUrl = 'https://scribe.rip/' + details.url;
+      } else {
+        // Default to freedium
+        redirectUrl = 'https://freedium.cfd/' + details.url;
+      }
+
+      console.log(`[BPC] Redirecting Medium article to ${target}:`, redirectUrl);
+      return { redirectUrl: redirectUrl };
+    },
+    { urls: medium_domains, types: ["main_frame"] },
+    ["blocking"]
+  );
+
+  console.log('[BPC v4.0] Medium redirect handler registered (default: OFF)');
+}
+
 console.log('[BPC v4.0] Background initialization script loaded');

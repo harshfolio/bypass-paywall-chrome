@@ -22,16 +22,16 @@ const ext_api = (typeof browser === 'object') ? browser : chrome;
     const archiveToggle = document.getElementById('toggle-archive');
 
     if (mediumRedirectToggle) {
-      mediumRedirectToggle.checked = settings.features.mediumRedirect !== false;
+      mediumRedirectToggle.checked = settings.features.mediumRedirect === true;
     }
     if (mediumRedirectTarget) {
       mediumRedirectTarget.value = settings.features.mediumRedirectTarget || 'freedium';
     }
     if (ampRedirectToggle) {
-      ampRedirectToggle.checked = settings.features.ampRedirect !== false;
+      ampRedirectToggle.checked = settings.features.ampRedirect === true;
     }
     if (archiveToggle) {
-      archiveToggle.checked = settings.features.archiveRedirect !== false;
+      archiveToggle.checked = settings.features.archiveRedirect === true;
     }
 
     // Medium redirect toggle handler
