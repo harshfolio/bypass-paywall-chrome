@@ -4,16 +4,34 @@ const ext_api = (typeof browser === 'object') ? browser : chrome;
 // Initialize enhanced features
 (async function initEnhancedFeatures() {
   try {
-    // Load settings
+    // Load settings with proper defaults
     let data = await ext_api.storage.sync.get('userSettings');
-    let settings = data.userSettings || {
+
+    // Define default settings (OFF by default - user must enable)
+    const defaultSettings = {
       features: {
-        mediumRedirect: true,
+        mediumRedirect: false,
         mediumRedirectTarget: 'freedium',
-        ampRedirect: true,
-        archiveRedirect: true
+        ampRedirect: false,
+        archiveRedirect: false
       }
     };
+
+    // Deep merge helper (reused from UserSettings pattern)
+    function deepMerge(target, source) {
+      let result = { ...target };
+      for (let key in source) {
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+          result[key] = deepMerge(target[key] || {}, source[key]);
+        } else if (source[key] !== undefined) {
+          result[key] = source[key];
+        }
+      }
+      return result;
+    }
+
+    // Merge defaults with loaded settings
+    let settings = deepMerge(defaultSettings, data.userSettings || {});
 
     // Set toggle states
     const mediumRedirectToggle = document.getElementById('toggle-medium-redirect');
@@ -22,16 +40,16 @@ const ext_api = (typeof browser === 'object') ? browser : chrome;
     const archiveToggle = document.getElementById('toggle-archive');
 
     if (mediumRedirectToggle) {
-      mediumRedirectToggle.checked = settings.features.mediumRedirect === true;
+      mediumRedirectToggle.checked = settings.features.mediumRedirect;
     }
     if (mediumRedirectTarget) {
-      mediumRedirectTarget.value = settings.features.mediumRedirectTarget || 'freedium';
+      mediumRedirectTarget.value = settings.features.mediumRedirectTarget;
     }
     if (ampRedirectToggle) {
-      ampRedirectToggle.checked = settings.features.ampRedirect === true;
+      ampRedirectToggle.checked = settings.features.ampRedirect;
     }
     if (archiveToggle) {
-      archiveToggle.checked = settings.features.archiveRedirect === true;
+      archiveToggle.checked = settings.features.archiveRedirect;
     }
 
     // Medium redirect toggle handler
