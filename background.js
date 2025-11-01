@@ -9,10 +9,11 @@ var navigator_ua = navigator.userAgent;
 var navigator_ua_mobile = navigator_ua.toLowerCase().includes('mobile');
 var kiwi_browser = navigator_ua_mobile && (url_loc === 'chrome') && !navigator_ua.toLowerCase().includes('yabrowser') && (navigator_ua.includes('Chrome/') && navigator_ua.match(/Chrome\/(\d+)/)[1] < 116);
 
-// BPC v4.0: Load optimized initialization system
+// BPC v4.0: Load sites.js FIRST, then optimization systems
 if (ext_manifest_version === 3) {
+  // Load sites.js BEFORE background-init.js to ensure variables are defined
+  self.importScripts('sites.js');
   self.importScripts('background-init.js');
-  // Note: background-init.js loads sites.js internally with performance monitoring
 }
 
 if (typeof ext_api.action !== 'object') {
@@ -60,10 +61,14 @@ var restrictions = {
   'uol.com.br': /^((?!(conta|email|piaui\.folha)\.uol\.com\.br).)*$/,
 }
 
-for (let domain of au_news_corp_domains)
-  restrictions[domain] = new RegExp('^((?!todayspaper\\.' + domain.replace(/\./g, '\\.') + '\\/).)*$');
-for (let domain of ch_media_domains)
-  restrictions[domain] = new RegExp('^((?!epaper\\.' + domain.replace(/\./g, '\\.') + '\\/).)*$');
+if (typeof au_news_corp_domains !== 'undefined' && au_news_corp_domains) {
+  for (let domain of au_news_corp_domains)
+    restrictions[domain] = new RegExp('^((?!todayspaper\\.' + domain.replace(/\./g, '\\.') + '\\/).)*$');
+}
+if (typeof ch_media_domains !== 'undefined' && ch_media_domains) {
+  for (let domain of ch_media_domains)
+    restrictions[domain] = new RegExp('^((?!epaper\\.' + domain.replace(/\./g, '\\.') + '\\/).)*$');
+}
 
 if (typeof browser !== 'object') {
   for (let domain of [])

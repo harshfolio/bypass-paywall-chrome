@@ -23,8 +23,9 @@ var bpcInitializing = false;
 
 /**
  * Initialize all BPC v4.0 optimization systems
+ * NOTE: sites.js is already loaded by background.js before this runs
  */
-async function initializeBPC() {
+function initializeBPC() {
   if (bpcInitialized || bpcInitializing) return;
   bpcInitializing = true;
 
@@ -32,36 +33,21 @@ async function initializeBPC() {
   console.log('[BPC v4.0] Starting initialization...');
 
   try {
-    // Step 1: Check and run migration if needed
-    await migration.checkAndMigrate();
+    // sites.js is already loaded by background.js - just build indexes
 
-    // Step 2: Initialize user settings
-    await userSettings.init();
-
-    // Step 3: Initialize usage learner
-    await usageLearner.init();
-
-    // Step 4: Determine which sites to load in core
-    const coreStites = await determineCoreSites();
-
-    // Step 5: Load core site configurations
-    const coreStart = performance.now();
-    self.importScripts('sites.js'); // Load default sites temporarily
-    console.log(`[BPC] Core sites loaded in ${(performance.now() - coreStart).toFixed(2)}ms`);
-
-    // Step 6: Build indexes from core sites
+    // Step 1: Build indexes from already-loaded sites
     const indexStart = performance.now();
     siteIndexes.buildIndexes(defaultSites);
     console.log(`[BPC] Indexes built in ${(performance.now() - indexStart).toFixed(2)}ms`);
 
-    // Step 7: Build header modification rules
+    // Step 2: Build header modification rules
     const headerStart = performance.now();
     headerEngine.buildRules(siteIndexes, navigator_ua_mobile);
     console.log(`[BPC] Header rules built in ${(performance.now() - headerStart).toFixed(2)}ms`);
 
-    // Step 8: Initialize chunk loader (for future lazy loading)
+    // Step 3: Initialize chunk loader (for future lazy loading)
     // TODO: Initialize with chunk manifest when sites are split
-    // await chunkLoader.init(chunkManifest);
+    // chunkLoader.init(chunkManifest);
 
     // Record total startup time
     const totalTime = performance.now() - overallStart;
@@ -73,8 +59,7 @@ async function initializeBPC() {
     console.log(`[BPC v4.0] ✓ Initialization complete in ${totalTime.toFixed(2)}ms`);
     console.log('[BPC v4.0] Stats:', {
       sites: siteIndexes.getStats(),
-      headers: headerEngine.getStats(),
-      usage: usageLearner.getStats()
+      headers: headerEngine.getStats()
     });
 
     return true;
@@ -86,18 +71,7 @@ async function initializeBPC() {
   }
 }
 
-/**
- * Determine which sites should be in core based on region and usage
- */
-async function determineCoreSites() {
-  const region = userSettings.get('preferredRegion') || 'global';
-  console.log(`[BPC] Region: ${region}`);
-
-  // TODO: When sites are split into chunks, load regional core here
-  // For now, we load all sites (backward compatible)
-
-  return [];
-}
+// determineCoreSites function removed - not needed in synchronous init
 
 /**
  * Handle message passing for cache clearing and other commands
@@ -175,9 +149,7 @@ async function trackSiteVisit(domain) {
   }
 }
 
-// Initialize on extension load
-initializeBPC().catch(error => {
-  console.error('[BPC v4.0] Critical initialization error:', error);
-});
+// Initialize on extension load (synchronous)
+initializeBPC();
 
 console.log('[BPC v4.0] Background initialization script loaded');
