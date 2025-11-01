@@ -1,0 +1,123 @@
+{
+  "Autocar.co.uk": {
+    "domain": "autocar.co.uk",
+    "allow_cookies": 1,
+    "ld_json": "div.ms-block|div.block-node",
+    "upd_version": "3.9.5.5"
+  },
+  "Der Freitag": {
+    "domain": "freitag.de",
+    "allow_cookies": 1,
+    "ld_json": "aside.qa-paywall|div.bo-article-text",
+    "upd_version": "3.9.3.2"
+  },
+  "Groupe Rossel": {
+    "domain": "###_fr_be_groupe_rossel",
+    "group": [
+      "aisnenouvelle.fr",
+      "courrier-picard.fr",
+      "lardennais.fr",
+      "lesoir.be",
+      "lest-eclair.fr",
+      "liberation-champagne.fr",
+      "lunion.fr",
+      "nordlittoral.fr",
+      "paris-normandie.fr"
+    ],
+    "allow_cookies": 1,
+    "useragent_custom": "Mozilla/5.0 (Java) outbrain",
+    "upd_version": "3.9.3.4"
+  },
+  "Initium Media": {
+    "domain": "theinitium.com",
+    "allow_cookies": 1,
+    "block_regex": "\\.wallkit\\.net\\/js\\/",
+    "block_host_perm_add": "wallkit.net",
+    "upd_version": "3.9.4.1"
+  },
+  "Manager-magazin.de": {
+    "domain": "manager-magazin.de",
+    "allow_cookies": 1,
+    "ld_archive_is": "div[data-area='paywall']|article",
+    "upd_version": "3.9.3.3"
+  },
+  "New Voice (nv.ua)": {
+    "domain": "nv.ua",
+    "allow_cookies": 1,
+    "block_regex": "\\.ampproject\\.org\\/v0\\/amp-access-.+\\.js",
+    "amp_redirect": "div[id^='media_paywall']",
+    "upd_version": "3.9.3.8"
+  },
+  "Next.ink (removed)": {
+    "domain": "next.ink",
+    "allow_cookies": 1,
+    "nofix": 1,
+    "upd_version": "3.9.5.2"
+  },
+  "PhiloMag.com": {
+    "domain": "philomag.com",
+    "allow_cookies": 1,
+    "block_regex": "\\.qiota\\.com",
+    "upd_version": "3.9.5.2"
+  },
+  "Sciences Humaines": {
+    "domain": "scienceshumaines.com",
+    "allow_cookies": 1,
+    "block_regex": "\\.qiota\\.com",
+    "upd_version": "3.9.5.4"
+  },
+  "T3n.de": {
+    "domain": "t3n.de",
+    "allow_cookies": 1,
+    "ld_json": "div.c-paywall__wrapper|div.paywall-blur>p",
+    "upd_version": "3.9.5.7"
+  },
+  "The Chronicle of Higher Education": {
+    "domain": "###_usa_chronicle",
+    "group": [
+      "chronicle.com",
+      "philanthropy.com"
+    ],
+    "allow_cookies": 1,
+    "block_regex": "\\.{domain}\\/script\\.js",
+    "cs_code":  "[{\"cond\":\"div[class~='contentBody' i][hidden]\", \"rm_attrib\":\"hidden|ppajfrg86rdhoubtirllb2bf1xsaknzus\"}]",
+    "upd_version": "3.9.3.8"
+  },
+  "The Diplomat": {
+    "domain": "thediplomat.com",
+    "useragent": "facebookbot",
+    "cs_code":  "[{\"cond\":\"article>section.h-96\", \"rm_class\":\"h-96\"}]",
+    "upd_version": "3.9.3.6"
+  },
+  "The Economist": {
+    "domain": "economist.com",
+    "allow_cookies": 1,
+    "block_regex": "(\\/zephr\\/feature|\\.economist\\.com\\/latest\\/wall-ui\\.js)",
+    "useragent_custom": "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.6533.103 Mobile Safari/537.36 Lamarr",
+    "upd_version": "3.9.4.7"
+  },
+  "The (New Orleans) Advocate": {
+    "domain": "###_usa_theadvocate",
+    "group": [
+      "nola.com",
+      "theadvocate.com"
+    ],
+    "allow_cookies": 1,
+    "block_regex": "(\\.{domain}\\/(script|.+\\/tncms\\/api\\/access\\..+)\\.js|\\.townnews\\.com\\/.+\\/engage\\.min\\.js)",
+    "block_host_perm_add": "townnews.com",
+    "upd_version": "3.9.3.5"
+  },
+  "The Verge": {
+    "domain": "theverge.com",
+    "allow_cookies": 1,
+    "block_regex": "\\.theverge\\.com\\/zephr\\/feature",
+    "upd_version": "3.9.5.3"
+  },
+  "Zephr": {
+    "domain": "zephr.com",
+    "allow_cookies": 1,
+    "block_regex_general": "(\\.zephr\\.com\\/zephr-browser\\/|\\/zephr\\/feature)",
+    "excluded_domains": ["theverge.com"],
+    "upd_version": "3.9.5.3"
+  }
+}

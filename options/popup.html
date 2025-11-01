@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="options_all.css"/>
+  <link rel="stylesheet" href="popup_switch.css"/>
+  <style>
+    body {
+      text-align: center;
+    }
+    div {
+      margin: 10px;
+    }
+    .toggle-section {
+      background: #f9f9f9;
+      padding: 12px;
+      margin: 10px;
+      border-radius: 6px;
+      text-align: left;
+    }
+    .toggle-section h4 {
+      margin: 0 0 10px 0;
+      font-size: 13px;
+      color: #555;
+    }
+    .toggle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 12px;
+    }
+    .toggle-item label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .toggle-item input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .toggle-item select {
+      padding: 3px 6px;
+      font-size: 11px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body style="width:320px">
+<div><strong>Bypass Paywalls Clean <span id="version"></span></strong><span id="site_switch_span">&nbsp;&nbsp;</span></div>
+
+<!-- New Quick Toggles Section -->
+<div class="toggle-section">
+  <h4>⚡ Quick Toggles</h4>
+  <div class="toggle-item">
+    <label>
+      <input type="checkbox" id="toggle-medium-redirect" checked>
+      <span>Medium Redirect</span>
+    </label>
+    <select id="medium-redirect-target">
+      <option value="freedium">Freedium</option>
+      <option value="scribe">Scribe</option>
+    </select>
+  </div>
+  <div class="toggle-item">
+    <label>
+      <input type="checkbox" id="toggle-amp-redirect" checked>
+      <span>AMP Redirects</span>
+    </label>
+  </div>
+  <div class="toggle-item">
+    <label>
+      <input type="checkbox" id="toggle-archive" checked>
+      <span>Archive.is Fallback</span>
+    </label>
+  </div>
+</div>
+
+<div><a href="options.html" target="_blank">Options</a> |
+<a href="options_custom.html" target="_blank">Custom</a> |
+<a href="/README.html" target="_blank">Help</a> |
+<a href="https://x.com/Magnolia1234B" target="_blank">X (Twitter)</a></div>
+<div><a href="https://gitflic.ru/project/magnolia1234/bypass-paywalls-chrome-clean/blob/raw?file=changelog.txt" target="_blank">Changelog</a> |
+<button id="clear_cookies" title="clear cookies (and local storage) for current site">clear cookies<br>(& permission)</button> |
+<button id="clear_cache" title="clear performance cache">clear cache</button> |
+<button id="button-close" title="close popup">close</button></div>
+<div><span id="version_new"></span></div>
+<div><span>* for unlisted sites: first clear cookies (X = no fix) & block general paywall-scripts (in options) or use custom sites/reader view</span></div>
+<div><span id="archive"></span></div>
+<script id="popup" src="version.js"></script>
+<script src="popup.js"></script>
+<script src="popup-enhanced.js"></script>
+</body>
+</html>
